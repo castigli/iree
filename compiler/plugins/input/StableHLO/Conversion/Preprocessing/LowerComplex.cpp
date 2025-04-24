@@ -113,6 +113,7 @@ ElementsAttr getSplat(Builder *b, Value val, T constant) {
 } // end anonymous namespace
 
 namespace {
+using namespace ::mlir::stablehlo;
 #include "compiler/plugins/input/StableHLO/Conversion/Preprocessing/ComplexLoweringPatterns.h.inc"
 } // end anonymous namespace
 
