@@ -30,7 +30,8 @@
 	url = https://github.com/powderluv/musl.git
 [submodule "third_party/stablehlo"]
 	path = third_party/stablehlo
-	url = https://github.com/iree-org/stablehlo.git
+	url = https://github.com/castigli/stablehlo.git
+	branch = v1.10.6-patched
 [submodule "third_party/torch-mlir"]
 	path = third_party/torch-mlir
 	url = https://github.com/iree-org/torch-mlir.git
