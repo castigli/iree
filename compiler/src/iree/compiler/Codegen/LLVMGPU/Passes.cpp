@@ -1056,6 +1056,11 @@ void addGPUWarpReductionPassPipeline(OpPassManager &funcPassManager,
 }
 
 void addGPUSimpleDistributePassPipeline(OpPassManager &funcPassManager) {
+  
+  funcPassManager.addPass(
+      IREE::LinalgExt::createConvertAttentionToOnlineAttentionPass());
+  funcPassManager.addPass(IREE::LinalgExt::createDecomposeAttentionPass());
+  
   tileAndBufferize(funcPassManager);
 
   // Distribute linalg onto threads within the workgroup.
@@ -1063,6 +1068,7 @@ void addGPUSimpleDistributePassPipeline(OpPassManager &funcPassManager) {
       /*distributeToWarp=*/clDistributeToWorkgroupsUsingForall));
   funcPassManager.addPass(createCanonicalizerPass());
   funcPassManager.addPass(createCSEPass());
+    
 
   funcPassManager.addPass(createPropagateDispatchSizeBoundsPass());
   funcPassManager.addPass(createRemoveSingleIterationLoopPass());
