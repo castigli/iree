@@ -1056,12 +1056,36 @@ void addGPUWarpReductionPassPipeline(OpPassManager &funcPassManager,
 }
 
 void addGPUSimpleDistributePassPipeline(OpPassManager &funcPassManager) {
+   
+  // tileAndBufferize(funcPassManager);
+  ConvertToDestinationPassingStylePassOptions options;
+  options.useWARForCooperativeMatrixCodegen = true;
+  tileAndDistributeToWorkgroup(funcPassManager, /*useForall=*/true,
+                               /*convertToDpsOptions=*/options);
   
   funcPassManager.addPass(
-      IREE::LinalgExt::createConvertAttentionToOnlineAttentionPass());
+    IREE::LinalgExt::createConvertAttentionToOnlineAttentionPass());
+  funcPassManager.addPass(createConfigTrackingCanonicalizerPass());
+  funcPassManager.addPass(createCSEPass());
+
+  funcPassManager.addPass(createGPUPromoteMatmulOperandsPass());
+
+  // Tile to reduction loops.
+  {
+    GPUApplyTilingLevelPassOptions options;
+    options.tilingLevel = IREE::GPU::TilingLevel::Reduction;
+    options.allowZeroSlices = true;
+    funcPassManager.addPass(createGPUApplyTilingLevelPass(options));
+    funcPassManager.addPass(affine::createLoopCoalescingPass());
+    funcPassManager.addPass(createConfigTrackingCanonicalizerPass());
+    funcPassManager.addPass(createCSEPass());
+  }
+                             
   funcPassManager.addPass(IREE::LinalgExt::createDecomposeAttentionPass());
-  
-  tileAndBufferize(funcPassManager);
+  funcPassManager.addPass(createConfigTrackingCanonicalizerPass());
+  funcPassManager.addPass(createCSEPass());
+
+  addBufferizePasses(funcPassManager);
 
   // Distribute linalg onto threads within the workgroup.
   funcPassManager.addPass(createLLVMGPUTileAndDistributePass(

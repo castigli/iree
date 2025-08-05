@@ -1931,6 +1931,18 @@ setVectorDistributionConfig(IREE::GPU::TargetAttr target,
                             Operation *computeOp) {
   // We haven't properly plumbed through MMA op layouts and conversions for CUDA
   // to target NVIDIA GPUs. So disable the vector distribution pass for it.
+  // if (!isROCmBackend(target)) {
+  //   // Still need to tile attention
+  //   if (auto attnOp = dyn_cast<IREE::LinalgExt::AttentionOp>(computeOp)) {
+  //     LDBG("VectorDistribution: trying to find a suitable attention config");
+  //     if (succeeded(setAttentionIntrinsicBasedVectorDistributionConfig(
+  //             target, entryPoint, attnOp))) {
+  //       return success();
+  //     }
+  //     return setAttentionVectorDistributionConfig(target, entryPoint, attnOp);
+  //   }
+  //   return failure();
+  // }
   if (!isROCmBackend(target))
     return failure();
 
@@ -3149,6 +3161,11 @@ static LogicalResult setRootConfig(IREE::GPU::TargetAttr target,
           return setRootDefaultConfig(target, entryPointFn, computeOp);
         }
         return success();
+      })
+      .Case<IREE::LinalgExt::AttentionOp>([&](auto attentionOp) {
+        LDBG("AttentionOp Config");
+        return setAttentionVectorDistributionConfig(target, entryPointFn,
+                                                     attentionOp);
       })
       .Default([&](auto op) {
         LDBG("Default Config");
