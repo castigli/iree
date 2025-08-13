@@ -9,7 +9,7 @@
 #include <stddef.h>
 
 #include "iree/base/api.h"
-#include "iree/hal/drivers/cuda/cuda_allocator.h"
+#include "iree/hal/drivers/cuda/cuda_device.h"
 #include "iree/hal/drivers/cuda/cuda_buffer.h"
 #include "iree/hal/drivers/cuda/cuda_dynamic_symbols.h"
 #include "iree/hal/drivers/cuda/cuda_status_util.h"
@@ -385,6 +385,18 @@ static iree_status_t iree_hal_cuda_allocator_allocate_buffer(
   CUdeviceptr device_ptr = 0;
   IREE_TRACE_ZONE_BEGIN_NAMED(z0, "iree_hal_cuda_buffer_allocate");
   IREE_TRACE_ZONE_APPEND_VALUE_I64(z0, allocation_size);
+
+  // Check device context
+  CUcontext current_context = NULL;
+  status = IREE_CURESULT_TO_STATUS(
+      allocator->symbols, cuCtxGetCurrent(&current_context));
+  if (iree_status_is_ok(status) && current_context == NULL) {
+    CUcontext device_context = iree_hal_cuda_device_context(allocator->parent_device);
+    status = IREE_CURESULT_TO_STATUS(
+      allocator->symbols, cuCtxSetCurrent(device_context));
+      // status = IREE_CURESULT_TO_STATUS(cuda_symbols, cuCtxSetCurrent(context));
+  }
+
   if (iree_all_bits_set(compat_params.type,
                         IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL)) {
     if (iree_all_bits_set(compat_params.type,
