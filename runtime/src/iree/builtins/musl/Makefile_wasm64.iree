@@ -21,6 +21,8 @@ IREE_BASE_SRCS = $(addprefix $(srcdir)/, \
 	src/math/exp2f_data.c \
 	src/math/sin.c \
 	src/math/cos.c \
+	src/math/exp.c \
+	src/math/exp_data.c \
 	src/math/atan.c \
 	src/math/atan2.c \
 	src/math/fabs.c \
@@ -31,8 +33,11 @@ IREE_BASE_SRCS = $(addprefix $(srcdir)/, \
 	src/math/__rem_pio2_large.c \
 	src/math/__math_invalidf.c \
 	src/math/__math_oflowf.c \
+	src/math/__math_oflow.c \
 	src/math/__math_uflowf.c \
-	src/math/__math_xflowf.c)
+	src/math/__math_uflow.c \
+	src/math/__math_xflowf.c \
+	src/math/__math_xflow.c)
 IREE_BASE_LLS = $(patsubst $(srcdir)/%,%.ll,$(basename $(IREE_BASE_SRCS)))
 IREE_BASE_BCS = $(patsubst $(srcdir)/%,%.bc,$(basename $(IREE_BASE_SRCS)))
 IREE_LL_FILES = $(addprefix obj/, $(IREE_BASE_LLS))
