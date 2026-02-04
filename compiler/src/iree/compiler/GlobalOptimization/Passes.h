@@ -93,6 +93,12 @@ struct TransformOptions : public PassPipelineOptions<TransformOptions> {
                      "feature built on top of this path will be deprecated."),
       llvm::cl::init(false),
   };
+  Option<bool> scanTransposePropagation{
+      *this,
+      "scan-transpose-propagation",
+      llvm::cl::desc("Enables transpose propagation through scan operations."),
+      llvm::cl::init(false),
+  };
   Option<bool> constEval{
       *this,
       "const-eval",

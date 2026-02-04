@@ -165,6 +165,9 @@ struct GlobalOptimizationOptions {
   // Enables propagation of transpose ops through convolutions.
   bool propagateTransposesThroughConv = false;
 
+  // Enables propagation of transpose ops through scan operations.
+  bool scanTransposePropagation = false;
+
   // Enables sinking transpose through pad operations.
   bool sinkTransposeThroughPad = false;
 

@@ -262,6 +262,12 @@ void GlobalOptimizationOptions::bindOptions(OptionsBinder &binder) {
       llvm::cl::desc(
           "Enables propagation of transpose ops through convolutions."),
       llvm::cl::cat(category));
+    binder.opt<bool>(
+      "iree-global-opt-propagate-transposes-through-scan",
+      scanTransposePropagation,
+      llvm::cl::desc(
+          "Enables propagation of transpose ops through scan operations."),
+      llvm::cl::cat(category));
   binder.opt<bool>(
       "iree-global-opt-enable-sink-transpose-through-pad",
       sinkTransposeThroughPad,

@@ -196,6 +196,8 @@ void buildIREEPrecompileTransformPassPipeline(
       globalOptimizationOptions.aggressiveTransposePropagation;
   globalTransformOptions.propagateTransposesThroughConv =
       globalOptimizationOptions.propagateTransposesThroughConv;
+  globalTransformOptions.scanTransposePropagation =
+      globalOptimizationOptions.scanTransposePropagation;
   globalTransformOptions.sinkTransposeThroughPad =
       globalOptimizationOptions.sinkTransposeThroughPad;
   globalTransformOptions.outerDimConcat =

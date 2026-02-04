@@ -194,6 +194,12 @@ void buildGlobalOptimizationPassPipeline(
   mainPassManager.addPass(
       GlobalOptimization::createConvertStridedContractionToContractionPass());
 
+  // Enable scan transpose propagation.
+  if (transformOptions.scanTransposePropagation) {
+    FunctionLikeNest(mainPassManager)
+        .addPass(mlir::createLinalgFoldTransposeIntoExtractInsertSlicePairPass);
+  }
+
   // Enable data tiling after they are in a canonical form.
   if (transformOptions.dataTiling) {
     FunctionLikeNest(mainPassManager)
