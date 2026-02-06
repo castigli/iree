@@ -124,6 +124,14 @@ void buildGlobalOptimizationPassPipeline(
       .addPass(mlir::createSimplifyDepthwiseConvPass);
   mainPassManager.addPass(createEraseUnusedLinalgOperandsPass());
 
+  // Enable scan transpose propagation.
+  if (transformOptions.scanTransposePropagation) {
+    FunctionLikeNest(mainPassManager)
+        .addPass(mlir::createLinalgSpecializeGenericOpsPass)
+        .addPass(mlir::createLinalgFoldTransposeIntoExtractInsertSlicePairPass)
+        .addPass(mlir::createCanonicalizerPass);
+  }
+
   // Expand tensor shapes into SSA values and optimize the whole program.
   // The more we are able to equate shape dimensions at this level the
   // better our fusions will be.
@@ -194,11 +202,6 @@ void buildGlobalOptimizationPassPipeline(
   mainPassManager.addPass(
       GlobalOptimization::createConvertStridedContractionToContractionPass());
 
-  // Enable scan transpose propagation.
-  if (transformOptions.scanTransposePropagation) {
-    FunctionLikeNest(mainPassManager)
-        .addPass(mlir::createLinalgFoldTransposeIntoExtractInsertSlicePairPass);
-  }
 
   // Enable data tiling after they are in a canonical form.
   if (transformOptions.dataTiling) {
